@@ -1,0 +1,6 @@
+com\example\model\Person.class
+com\example\dao\ClientDAO.class
+com\example\ClientApp.class
+com\example\dao\Database.class
+com\example\model\Client.class
+com\example\model\Employment.class
