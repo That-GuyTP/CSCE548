@@ -16,5 +16,5 @@ The semester-long project I will be tasked with creating and examining to see if
 1. Open a terminal and navigate to, "CSCE548/clientapp"
 2. Run "mvn spring-boot:run"
 3. Open a second terminal and navigate to "CSCE548/clientapp-frontend/ConsoleFrontend.java".
-4. Run ConsoleFrontend.java file.
+4. Run "java ConsoleFrontend.java"
 5. Profit.
