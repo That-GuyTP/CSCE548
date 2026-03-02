@@ -22,6 +22,8 @@ services:
     envVars:
       - key: REACT_APP_API_BASE_URL
         value: https://client-info-api.onrender.com
+      - key: NODE_VERSION
+        value: 20.11.1
 
 databases:
   - name: client-info-db
