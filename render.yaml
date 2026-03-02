@@ -20,7 +20,7 @@ services:
       # - key: SPRING_DATASOURCE_PASSWORD
       #   fromDatabase: { name: client-info-db, property: password }
 
-  - type: static_site
+  - type: static
     name: client-info-frontend
     rootDir: frontend
     buildCommand: npm ci && npm run build
