@@ -1,33 +1,25 @@
 services:
   - type: web
     name: client-info-api
-    env: java
-    plan: free
+    runtime: docker
     rootDir: backend
-    buildCommand: ./mvnw -DskipTests package
-    startCommand: java -jar target/*.jar
+    dockerfilePath: backend/Dockerfile
+    dockerContext: backend
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
-      # Render will inject DATABASE_URL from the db section below if you use "fromDatabase"
       - key: SPRING_DATASOURCE_URL
         fromDatabase:
           name: client-info-db
           property: connectionString
-      # If you use Spring's separate username/password instead of a JDBC URL:
-      # - key: SPRING_DATASOURCE_USERNAME
-      #   fromDatabase: { name: client-info-db, property: user }
-      # - key: SPRING_DATASOURCE_PASSWORD
-      #   fromDatabase: { name: client-info-db, property: password }
 
   - type: web
-    runtime: static
     name: client-info-frontend
+    runtime: static
     rootDir: frontend
     buildCommand: npm ci && npm run build
     staticPublishPath: build
     envVars:
-      # Used at build-time by CRA/Vite/etc; adjust to your frontend framework’s convention
       - key: REACT_APP_API_BASE_URL
         value: https://client-info-api.onrender.com
 
