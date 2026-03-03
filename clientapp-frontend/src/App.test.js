@@ -131,4 +131,25 @@ describe("Client CRUD buttons", () => {
       { method: "DELETE" }
     );
   });
+
+  test("Clear empties all input fields", () => {
+    render(<App />);
+
+    const clientIdInput = screen.getByLabelText(/Client ID/i);
+    const firstNameInput = screen.getByLabelText(/First Name/i);
+    const lastNameInput = screen.getByLabelText(/Last Name/i);
+    const employmentInput = screen.getByLabelText(/Employment/i);
+
+    fireEvent.change(clientIdInput, { target: { value: "1" } });
+    fireEvent.change(firstNameInput, { target: { value: "Jane" } });
+    fireEvent.change(lastNameInput, { target: { value: "Doe" } });
+    fireEvent.change(employmentInput, { target: { value: "W2" } });
+
+    fireEvent.click(screen.getByRole("button", { name: "Clear" }));
+
+    expect(clientIdInput.value).toBe("");
+    expect(firstNameInput.value).toBe("");
+    expect(lastNameInput.value).toBe("");
+    expect(employmentInput.value).toBe("");
+  });
 });

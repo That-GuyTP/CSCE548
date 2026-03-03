@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-const PRIMARY_API_BASE = window.location.hostname === "localhost" ? "http://localhost:8080" : "";
-const FALLBACK_API_BASE = process.env.REACT_APP_API_BASE_URL || "";
+const PRIMARY_API_BASE = process.env.REACT_APP_API_BASE_URL ||
+  (window.location.hostname === "localhost" ? "http://localhost:8080" : "");
 
 export default function App() {
   const [clientId, setClientId] = useState("");
@@ -25,16 +25,6 @@ export default function App() {
       let response = await fetch(`${PRIMARY_API_BASE}${path}`, {
         ...requestOptions,
       });
-
-      if (
-        response.status === 404 &&
-        FALLBACK_API_BASE &&
-        FALLBACK_API_BASE !== PRIMARY_API_BASE
-      ) {
-        response = await fetch(`${FALLBACK_API_BASE}${path}`, {
-          ...requestOptions,
-        });
-      }
 
       const contentType = response.headers.get("content-type") || "";
       const hasJson = contentType.includes("application/json");
@@ -100,6 +90,13 @@ export default function App() {
     doRequest(`/api/clients/${clientId.trim()}`, { method: "DELETE" });
   };
 
+  const handleClear = () => {
+    setClientId("");
+    setFirstName("");
+    setLastName("");
+    setEmployment("");
+  };
+
   return (
     <main className="page">
       <p style={{ color: "red", margin: "0 0 8px", fontSize: "0.9rem" }}>
@@ -148,6 +145,7 @@ export default function App() {
         <button onClick={handleCreate} disabled={loading}>CREATE</button>
         <button onClick={handleModify} disabled={loading}>MODIFY</button>
         <button onClick={handleDelete} disabled={loading}>DELETE</button>
+        <button onClick={handleClear} disabled={loading}>Clear</button>
       </div>
 
       <h2>Response</h2>
