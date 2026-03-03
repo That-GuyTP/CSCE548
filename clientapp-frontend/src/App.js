@@ -14,9 +14,16 @@ export default function App() {
   const doRequest = async (path, options = {}) => {
     setLoading(true);
     try {
+      const requestOptions = { ...options };
+      if (requestOptions.body) {
+        requestOptions.headers = {
+          "Content-Type": "application/json",
+          ...(requestOptions.headers || {}),
+        };
+      }
+
       let response = await fetch(`${PRIMARY_API_BASE}${path}`, {
-        headers: { "Content-Type": "application/json" },
-        ...options,
+        ...requestOptions,
       });
 
       if (
@@ -25,8 +32,7 @@ export default function App() {
         FALLBACK_API_BASE !== PRIMARY_API_BASE
       ) {
         response = await fetch(`${FALLBACK_API_BASE}${path}`, {
-          headers: { "Content-Type": "application/json" },
-          ...options,
+          ...requestOptions,
         });
       }
 
