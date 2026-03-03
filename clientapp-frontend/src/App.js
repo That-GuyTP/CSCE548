@@ -1,6 +1,7 @@
 import { useState } from "react";
 
-const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080";
+const PRIMARY_API_BASE = window.location.hostname === "localhost" ? "http://localhost:8080" : "";
+const FALLBACK_API_BASE = process.env.REACT_APP_API_BASE_URL || "";
 
 export default function App() {
   const [clientId, setClientId] = useState("");
@@ -13,10 +14,21 @@ export default function App() {
   const doRequest = async (path, options = {}) => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE}${path}`, {
+      let response = await fetch(`${PRIMARY_API_BASE}${path}`, {
         headers: { "Content-Type": "application/json" },
         ...options,
       });
+
+      if (
+        response.status === 404 &&
+        FALLBACK_API_BASE &&
+        FALLBACK_API_BASE !== PRIMARY_API_BASE
+      ) {
+        response = await fetch(`${FALLBACK_API_BASE}${path}`, {
+          headers: { "Content-Type": "application/json" },
+          ...options,
+        });
+      }
 
       const contentType = response.headers.get("content-type") || "";
       const hasJson = contentType.includes("application/json");

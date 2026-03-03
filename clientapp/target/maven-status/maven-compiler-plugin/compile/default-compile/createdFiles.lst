@@ -1,13 +1,14 @@
 com\example\repo\PersonRepository.class
-com\example\model\Person.class
 com\example\dao\ClientDAOImpl.class
 com\example\ClientApp.class
 com\example\controllers\ClientController.class
+com\example\controllers\EmploymentController.class
+com\example\dao\ClientDAO.class
+com\example\model\Person.class
 com\example\controllers\ClientController$ClientUpdateRequest.class
 com\example\repo\ClientRepository.class
-com\example\controllers\EmploymentController.class
+com\example\config\WebConfig.class
 com\example\controllers\PersonController.class
-com\example\dao\ClientDAO.class
 com\example\repo\EmploymentRepository.class
 com\example\exception\ResourceNotFoundException.class
 com\example\exception\InvalidRequestException.class
