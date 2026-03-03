@@ -38,6 +38,11 @@ export default function App() {
         );
       }
 
+      if (response.status === 204) {
+        setResult("Success: client deleted.");
+        return;
+      }
+
       setResult(
         payload ? JSON.stringify(payload, null, 2) : `${response.status} ${response.statusText}`
       );
