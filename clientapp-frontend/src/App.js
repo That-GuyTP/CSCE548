@@ -102,9 +102,12 @@ export default function App() {
 
   return (
     <main className="page">
+      <p style={{ color: "red", margin: "0 0 8px", fontSize: "0.9rem" }}>
+        Since this is a free Render project, it can take up to 50 seconds to run the backend from idle.
+      </p>
       <h1>Client CRUD</h1>
 
-      <label htmlFor="clientId">Client ID (for VIEW single, MODIFY, DELETE)</label>
+      <label htmlFor="clientId">Client ID (for single VIEW enter number otherwise leave bank for all, MODIFY, DELETE)</label>
       <input
         id="clientId"
         type="number"
