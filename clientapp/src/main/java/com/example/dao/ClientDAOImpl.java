@@ -48,6 +48,14 @@ public class ClientDAOImpl implements ClientDAO {
         c.setFirstName(firstName);
         c.setLastName(lastName);
         c.setEmployment(employment);
+
+        // Keep person name fields synchronized with client names when a person record exists.
+        personRepo.findById(clientId).ifPresent(person -> {
+            person.setFirstName(firstName);
+            person.setLastName(lastName);
+            personRepo.save(person);
+        });
+
         return clientRepo.save(c);
     }
 
