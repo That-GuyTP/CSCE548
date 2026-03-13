@@ -7,8 +7,8 @@ This is the repository for my ClientApp Project for CSCE 548. It is a web app th
 - [Maven](https://maven.apache.org/download.cgi#:~:text=Apache%20Maven-,Apache%20Maven%203.9.14,-Apache%20Maven%203.9.14)
 - [Node.js 20.x](https://nodejs.org/en/download) & npm
 ### If running locally
-* [MySQL](https://dev.mysql.com/downloads/installer/)
-* SQL Server (AN option when installing MySQL)
+* [MySQL](https://dev.mysql.com/downloads/installer/) (You may choose to use MySQLWorkspace or an IDE integration if desired)
+* SQL Server (An option when installing MySQL)
 ### If deploying to Render
 - [Render](https://render.com/) account
 - [PostgreSQL](https://www.postgresql.org/download/#:~:text=Packages%20and%20Installers)
