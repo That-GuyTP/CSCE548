@@ -3,7 +3,7 @@ This is the repository for my ClientApp Project for CSCE 548. It is a web app th
 
 # Requirements
 - [Git](https://git-scm.com/)
-- Java JDK 17+
+- [Java JDK 17+](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html#:~:text=(sha256%20)-,Windows%20x64%20Installer,-153.92%20MB)
 - [Maven](https://maven.apache.org/download.cgi#:~:text=Apache%20Maven-,Apache%20Maven%203.9.14,-Apache%20Maven%203.9.14)
 - [Node.js 20.x](https://nodejs.org/en/download) & npm
 ### If running locally
@@ -50,29 +50,37 @@ Since it's not possible to clone my local database I've included a schema and te
  # Deploying to Render
  - First you have to sign into a Render account and make your way to the dashboard.
  - You'll need to create a Database, Backend, and Frontend service. Feel free to put these all into the same project to help with organization.
- - Creating a Database
+ ## Creating a Database
+ First, create the database
   1. "+ New"
   2. "Postgres"
   3. Give it a name
   4. Ensure the "free" storage version is selected
   5. "Create Database"
-- Backend
-	 1. "+ New"
-	 2. "Web Service"
-	 3. Language: "Docker"
-		- There is currently a `Dockerfile` in the backend. You may need to make edits to it if it does not work.
-	 4. Auto-Deploy "On Commit"
-	 5. "Create"
-	 6. Navigate to "Environment -> Environment Variables" and create the following:
-		- `SRPING_PROFILES_ACTIVE=prod`
-		- `SPRING_DATASOURCE_URL=jdbc:postgresql://<your_database_hostname_here>:<your_database_port_here>/<your_database_name_here>`
-		- `SPRING_DATASOURCE_USERNAME=<your_database_users_username_here>`
-		- `SPRING_DATASOURCE_PASSWORD=<your_database_users_password_here>`
-	7. Manually deploy if needed.
-* Frontend
-	1. "+ New"
-	2. "Static Site"
-	3. "Build Command" = `npm run build`
-	4. "Auto-Deploy" = "On Commit"
-	5. "Create"
-	6. Manually deploy if needed
+Return this part when you have created the backend. Once done you'll need to flood the DB with a schema and data.
+1. Open up a PowerShell terminal
+2. Run:
+	```
+ 	psql "<RENDER_EXTERNAL_DATABASE_URL>" -f "...\clientapp\src\main\java\com\example\sql\schema(postgres_version).sql"
+	psql "<RENDER_EXTERNAL_DATABASE_URL>" -f "...\clientapp\src\main\java\com\example\sql\send_test_data(postgres_version).sql"
+ 	```
+## Backend
+1. "+ New"
+2. "Web Service"
+3. Language: "Docker"
+	- There is currently a `Dockerfile` in the backend. You may need to make edits to it if it does not work.
+4. Auto-Deploy "On Commit"
+5. "Create"
+6. Navigate to "Environment -> Environment Variables" and create the following:
+	- `SRPING_PROFILES_ACTIVE=prod`
+	- `SPRING_DATASOURCE_URL=jdbc:postgresql://<your_database_hostname_here>:<your_database_port_here>/<your_database_name_here>`
+	- `SPRING_DATASOURCE_USERNAME=<your_database_users_username_here>`
+	- `SPRING_DATASOURCE_PASSWORD=<your_database_users_password_here>`
+7. Manually deploy if needed.
+## Frontend
+1. "+ New"
+2. "Static Site"
+3. "Build Command" = `npm run build`
+4. "Auto-Deploy" = "On Commit"
+5. "Create"
+6. Manually deploy if needed
