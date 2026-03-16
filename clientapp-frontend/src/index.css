@@ -73,18 +73,18 @@ h2 {
 }
 
 .form-section-client {
-  border-color: #c4d8e8;
-  background: linear-gradient(180deg, #fbfdff, #eef5fb);
+  border-color: #a6c4da;
+  background: linear-gradient(180deg, #f5faff, #deebf7);
 }
 
 .form-section-person {
-  border-color: #c8ded3;
-  background: linear-gradient(180deg, #fbfffc, #eff7f2);
+  border-color: #abcab8;
+  background: linear-gradient(180deg, #f5fcf7, #deeee4);
 }
 
 .form-section-employment {
-  border-color: #e2d4bf;
-  background: linear-gradient(180deg, #fffdfa, #f8f1e8);
+  border-color: #d0bc9a;
+  background: linear-gradient(180deg, #fffaf2, #eee1cf);
 }
 
 .form-section h2 {
@@ -170,8 +170,8 @@ button:disabled {
   margin-top: 12px;
   padding: 12px;
   border-radius: 12px;
-  border: 1px solid #d3dfe8;
-  background: linear-gradient(180deg, #eef4f9, #e5edf4);
+  border: 1px solid #b9ccdb;
+  background: linear-gradient(180deg, #dde8f2, #cfdeeb);
 }
 
 .client-card {
