@@ -365,7 +365,7 @@ export default function App() {
   return (
     <main className="page">
       <p className="render-note">
-        Since this is a free Render project, it can take up to 50 seconds to run the backend from idle.
+        Since this is a free Render project, it can take up to 50 seconds to run the backend from idle. If nothing happens, refresh and try the button again.
       </p>
       <h1>Client CRUD</h1>
 

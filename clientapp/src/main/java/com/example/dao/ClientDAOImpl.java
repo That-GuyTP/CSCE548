@@ -68,10 +68,19 @@ public class ClientDAOImpl implements ClientDAO {
     public Person upsertPerson(Integer clientId, Person person) {
         Client c = clientRepo.findById(clientId)
                 .orElseThrow(() -> new IllegalArgumentException("Client not found: " + clientId));
-        c.setPerson(person);
-        clientRepo.save(c); // cascades Person
         return personRepo.findById(clientId)
-                .orElseThrow(() -> new IllegalStateException("Person not saved for client: " + clientId));
+                .map(existing -> {
+                    existing.setFirstName(person.getFirstName());
+                    existing.setLastName(person.getLastName());
+                    existing.setDateOfBirth(person.getDateOfBirth());
+                    existing.setAddress(person.getAddress());
+                    existing.setLegalSex(person.getLegalSex());
+                    return personRepo.save(existing);
+                })
+                .orElseGet(() -> {
+                    person.setClient(c);
+                    return personRepo.save(person);
+                });
     }
 
     @Override
@@ -88,10 +97,17 @@ public class ClientDAOImpl implements ClientDAO {
     public Employment upsertEmployment(Integer clientId, Employment employment) {
         Client c = clientRepo.findById(clientId)
                 .orElseThrow(() -> new IllegalArgumentException("Client not found: " + clientId));
-        c.setEmploymentDetails(employment);
-        clientRepo.save(c); // cascades Employment
         return employmentRepo.findById(clientId)
-                .orElseThrow(() -> new IllegalStateException("Employment not saved for client: " + clientId));
+                .map(existing -> {
+                    existing.setBusinessName(employment.getBusinessName());
+                    existing.setPositionName(employment.getPositionName());
+                    existing.setSalary(employment.getSalary());
+                    return employmentRepo.save(existing);
+                })
+                .orElseGet(() -> {
+                    employment.setClient(c);
+                    return employmentRepo.save(employment);
+                });
     }
 
     @Override
