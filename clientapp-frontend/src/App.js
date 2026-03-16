@@ -525,7 +525,7 @@ export default function App() {
         <button onClick={handleCreate} disabled={loading}>CREATE</button>
         <button onClick={handleModify} disabled={loading}>MODIFY</button>
         <button onClick={handleDelete} disabled={loading}>DELETE</button>
-        <button onClick={handleClear} disabled={loading}>Clear</button>
+        <button onClick={handleClear} disabled={loading}>Clear Inputs</button>
       </div>
 
       <h2>Response</h2>
