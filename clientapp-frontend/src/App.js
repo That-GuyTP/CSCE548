@@ -402,7 +402,7 @@ export default function App() {
       </p>
       <h1>Client CRUD</h1>
 
-      <section className="form-section">
+      <section className="form-section form-section-client">
         <h2>Client Record</h2>
         <label htmlFor="clientId">Client ID (use for single VIEW, MODIFY, DELETE)</label>
         <input
@@ -441,7 +441,7 @@ export default function App() {
         />
       </section>
 
-      <section className="form-section">
+      <section className="form-section form-section-person">
         <h2>Person Details</h2>
         <label htmlFor="personFirstName">Person First Name (optional, defaults to client first name)</label>
         <input
@@ -461,7 +461,7 @@ export default function App() {
           placeholder="e.g. Doe"
         />
 
-        <label htmlFor="dateOfBirth">Date of Birth (picker may display MM/DD/YYYY, sent as YYYY-MM-DD)</label>
+        <label htmlFor="dateOfBirth">Date of Birth (MM/DD/YYY)</label> {/* (picker may display MM/DD/YYYY, sent as YYYY-MM-DD) */}
         <input
           id="dateOfBirth"
           type="date"
@@ -488,7 +488,7 @@ export default function App() {
         />
       </section>
 
-      <section className="form-section">
+      <section className="form-section form-section-employment">
         <h2>Employment Details</h2>
         <label htmlFor="businessName">Business Name</label>
         <input
