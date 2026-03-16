@@ -21,6 +21,32 @@ const formatSalary = (value) => {
   return parsed.toLocaleString("en-US", { style: "currency", currency: "USD" });
 };
 
+const normalizeDateOfBirth = (value) => {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+
+  let normalized = trimmed;
+  const slashDate = trimmed.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (slashDate) {
+    const [, mm, dd, yyyy] = slashDate;
+    normalized = `${yyyy}-${mm.padStart(2, "0")}-${dd.padStart(2, "0")}`;
+  }
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(normalized)) return null;
+
+  const [yearText, monthText, dayText] = normalized.split("-");
+  const year = Number(yearText);
+  const month = Number(monthText);
+  const day = Number(dayText);
+  const parsedDate = new Date(Date.UTC(year, month - 1, day));
+  const isValidDate =
+    parsedDate.getUTCFullYear() === year &&
+    parsedDate.getUTCMonth() === month - 1 &&
+    parsedDate.getUTCDate() === day;
+
+  return isValidDate ? normalized : null;
+};
+
 export default function App() {
   const [clientId, setClientId] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -71,6 +97,7 @@ export default function App() {
     const trimmedEmployment = employment.trim();
     const trimmedPersonFirstName = personFirstName.trim() || trimmedFirstName;
     const trimmedPersonLastName = personLastName.trim() || trimmedLastName;
+    const trimmedDateOfBirth = dateOfBirth.trim();
     const trimmedAddress = address.trim();
     const trimmedLegalSex = legalSex.trim();
     const trimmedBusinessName = businessName.trim();
@@ -81,7 +108,7 @@ export default function App() {
     if (!trimmedFirstName) missingFields.push("client first name");
     if (!trimmedLastName) missingFields.push("client last name");
     if (!trimmedEmployment) missingFields.push("employment type/status");
-    if (!dateOfBirth.trim()) missingFields.push("date of birth");
+    if (!trimmedDateOfBirth) missingFields.push("date of birth");
     if (!trimmedAddress) missingFields.push("address");
     if (!trimmedLegalSex) missingFields.push("legal sex");
     if (!trimmedBusinessName) missingFields.push("business name");
@@ -99,6 +126,12 @@ export default function App() {
       return null;
     }
 
+    const normalizedDateOfBirth = normalizeDateOfBirth(trimmedDateOfBirth);
+    if (!normalizedDateOfBirth) {
+      setStatus("Error: date of birth must be a valid date in YYYY-MM-DD format.");
+      return null;
+    }
+
     return {
       clientPayload: {
         firstName: trimmedFirstName,
@@ -108,7 +141,7 @@ export default function App() {
       personPayload: {
         firstName: trimmedPersonFirstName,
         lastName: trimmedPersonLastName,
-        dateOfBirth,
+        dateOfBirth: normalizedDateOfBirth,
         address: trimmedAddress,
         legalSex: trimmedLegalSex,
       },
@@ -428,7 +461,7 @@ export default function App() {
           placeholder="e.g. Doe"
         />
 
-        <label htmlFor="dateOfBirth">Date of Birth (YYYY-MM-DD)</label>
+        <label htmlFor="dateOfBirth">Date of Birth (picker may display MM/DD/YYYY, sent as YYYY-MM-DD)</label>
         <input
           id="dateOfBirth"
           type="date"
