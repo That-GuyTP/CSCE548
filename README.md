@@ -15,7 +15,7 @@ This is the repository for my ClientApp Project for CSCE 548. It is a web app th
 - [CORS](https://www.npmjs.com/package/cors#:~:text=Original%20Author-,Installation,%24%20npm%20install%20cors,-Usage) (Only if your frontend Render URL differs from the backend config)
 
 # Running Locally
-## Database
+### Database
 Since it's not possible to clone my local database I've included a schema and test_data file so that you can copy the schema to your database and upload randomly generated test data. These can be located in "./clientapp/src/main/java/com/example/sql". You'll first have to get an SQL server running on your computer, and then create a new user.
   1. Ensure that your SQL server is up and running
   2. Create a new database or choose one you already have set up if desired
@@ -39,10 +39,10 @@ Since it's not possible to clone my local database I've included a schema and te
 		spring.datasource.username=<database_user_username>
 		spring.datasource.password=<database_user_password>
 		```
-## Backend
+### Backend
  1. `cd clientapp`
  2. `mvn spring-boot:run`
- ## Frontend
+### Frontend
  1. `cd clientapp-frontend`
  2. `npm ci`
  3. `npm start`
@@ -50,7 +50,7 @@ Since it's not possible to clone my local database I've included a schema and te
  # Deploying to Render
  - First you have to sign into a Render account and make your way to the dashboard.
  - You'll need to create a Database, Backend, and Frontend service. Feel free to put these all into the same project to help with organization.
- ## Creating a Database
+ ### Creating a Database
  First, create the database
   1. "+ New"
   2. "Postgres"
@@ -64,7 +64,7 @@ Return this part when you have created the backend. Once done you'll need to flo
  	psql "<RENDER_EXTERNAL_DATABASE_URL>" -f "...\clientapp\src\main\java\com\example\sql\schema(postgres_version).sql"
 	psql "<RENDER_EXTERNAL_DATABASE_URL>" -f "...\clientapp\src\main\java\com\example\sql\send_test_data(postgres_version).sql"
  	```
-## Backend
+### Backend
 1. "+ New"
 2. "Web Service"
 3. Language: "Docker"
@@ -77,7 +77,7 @@ Return this part when you have created the backend. Once done you'll need to flo
 	- `SPRING_DATASOURCE_USERNAME=<your_database_users_username_here>`
 	- `SPRING_DATASOURCE_PASSWORD=<your_database_users_password_here>`
 7. Manually deploy if needed.
-## Frontend
+### Frontend
 1. "+ New"
 2. "Static Site"
 3. "Build Command" = `npm run build`
