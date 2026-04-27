@@ -47,6 +47,25 @@ const normalizeDateOfBirth = (value) => {
   return isValidDate ? normalized : null;
 };
 
+const valueContains = (value, query) =>
+  String(value ?? "").toLowerCase().includes(query.trim().toLowerCase());
+
+function CollapsibleSection({ className, title, open, onToggle, children }) {
+  return (
+    <details
+      className={`form-section ${className}`}
+      open={open}
+      onToggle={(event) => onToggle(event.currentTarget.open)}
+    >
+      <summary>
+        <h2>{title}</h2>
+        <span className="section-toggle" aria-hidden="true">{open ? "▾" : "▸"}</span>
+      </summary>
+      <div className="section-body">{children}</div>
+    </details>
+  );
+}
+
 export default function App() {
   const [clientId, setClientId] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -63,6 +82,18 @@ export default function App() {
   const [status, setStatus] = useState("Ready.");
   const [resultData, setResultData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [openSections, setOpenSections] = useState({
+    client: true,
+    person: true,
+    employment: true,
+  });
+
+  const setSectionOpen = (sectionName, isOpen) => {
+    setOpenSections((current) => ({
+      ...current,
+      [sectionName]: isOpen,
+    }));
+  };
 
   const sendRequest = async (path, options = {}) => {
     const requestOptions = { ...options };
@@ -312,6 +343,24 @@ export default function App() {
     setResultData(null);
   };
 
+  const getFilteredClients = (clients) => {
+    const idQuery = clientId.trim();
+    const firstNameQuery = firstName.trim();
+    const lastNameQuery = lastName.trim();
+
+    if (!idQuery && !firstNameQuery && !lastNameQuery) {
+      return clients;
+    }
+
+    return clients.filter((client) => {
+      const idMatches = !idQuery || valueContains(client.clientId, idQuery);
+      const firstNameMatches = !firstNameQuery || valueContains(client.firstName, firstNameQuery);
+      const lastNameMatches = !lastNameQuery || valueContains(client.lastName, lastNameQuery);
+
+      return idMatches && firstNameMatches && lastNameMatches;
+    });
+  };
+
   const renderClientCard = (client, idx) => {
     const person = client.person;
     const employmentDetails = client.employmentDetails;
@@ -374,13 +423,25 @@ export default function App() {
     if (!resultData) return null;
 
     if (Array.isArray(resultData) && resultData.every(isClientPayload)) {
+      const filteredClients = getFilteredClients(resultData);
+
       if (resultData.length === 0) {
         return <p className="status-panel">No clients found.</p>;
       }
+
+      if (filteredClients.length === 0) {
+        return <p className="status-panel">No clients match the current search.</p>;
+      }
+
       return (
-        <div className="result-list">
-          {resultData.map((client, idx) => renderClientCard(client, idx))}
-        </div>
+        <>
+          <p className="result-count">
+            Showing {filteredClients.length} of {resultData.length} client record(s).
+          </p>
+          <div className="result-list">
+            {filteredClients.map((client, idx) => renderClientCard(client, idx))}
+          </div>
+        </>
       );
     }
 
@@ -401,10 +462,43 @@ export default function App() {
         Since this is a free Render project, it can take up to 50 seconds to run the backend from idle. If nothing happens, refresh and try the button again.
       </p>
       <h1>Client CRUD</h1>
+      <section className="instructions">
+        <h2>How to Use Client App</h2>
 
-      <section className="form-section form-section-client">
-        <h2>Client Record</h2>
-        <label htmlFor="clientId">Client ID (use for single VIEW, MODIFY, DELETE)</label>
+        <h3>Viewing a Record</h3>
+        <p>
+          To view a record in the database, enter the Client ID, Client First Name, and/or
+          Client Last Name into the inputs in the Client Record section. Then click VIEW at
+          the bottom.
+        </p>
+
+        <h3>Create a New Record</h3>
+        <p>
+          To create a new client record, enter all information in the Client Record, Person
+          Details, and Employment Details sections. Then click CREATE at the bottom.
+        </p>
+
+        <h3>Updating or Modifying a Client Record</h3>
+        <p>
+          To update an existing client record, add the correct Client ID in the Client Record
+          section, then add the changes you want to make in their respective inputs. When you
+          are finished, click MODIFY at the bottom.
+        </p>
+
+        <h3>Deleting a Record</h3>
+        <p>
+          To remove a record, put the Client ID into the Client ID field and click DELETE at
+          the bottom.
+        </p>
+      </section>
+
+      <CollapsibleSection
+        className="form-section-client"
+        title="Client Record"
+        open={openSections.client}
+        onToggle={(isOpen) => setSectionOpen("client", isOpen)}
+      >
+        <label htmlFor="clientId">Client ID</label>
         <input
           id="clientId"
           type="number"
@@ -413,7 +507,7 @@ export default function App() {
           placeholder="e.g. 1"
         />
 
-        <label htmlFor="firstName">Client First Name (CREATE/MODIFY)</label>
+        <label htmlFor="firstName">Client First Name</label>
         <input
           id="firstName"
           type="text"
@@ -422,7 +516,7 @@ export default function App() {
           placeholder="e.g. Jane"
         />
 
-        <label htmlFor="lastName">Client Last Name (CREATE/MODIFY)</label>
+        <label htmlFor="lastName">Client Last Name</label>
         <input
           id="lastName"
           type="text"
@@ -431,7 +525,7 @@ export default function App() {
           placeholder="e.g. Doe"
         />
 
-        <label htmlFor="employment">Employment Type / Status (CREATE/MODIFY)</label>
+        <label htmlFor="employment">Employment Type / Status</label>
         <input
           id="employment"
           type="text"
@@ -439,10 +533,14 @@ export default function App() {
           onChange={(e) => setEmployment(e.target.value)}
           placeholder="e.g. W2"
         />
-      </section>
+      </CollapsibleSection>
 
-      <section className="form-section form-section-person">
-        <h2>Person Details</h2>
+      <CollapsibleSection
+        className="form-section-person"
+        title="Person Details"
+        open={openSections.person}
+        onToggle={(isOpen) => setSectionOpen("person", isOpen)}
+      >
         <label htmlFor="personFirstName">Person First Name (optional, defaults to client first name)</label>
         <input
           id="personFirstName"
@@ -461,7 +559,7 @@ export default function App() {
           placeholder="e.g. Doe"
         />
 
-        <label htmlFor="dateOfBirth">Date of Birth (MM/DD/YYY)</label> {/* (picker may display MM/DD/YYYY, sent as YYYY-MM-DD) */}
+        <label htmlFor="dateOfBirth">Date of Birth (MM/DD/YYYY)</label> {/* (picker may display MM/DD/YYYY, sent as YYYY-MM-DD) */}
         <input
           id="dateOfBirth"
           type="date"
@@ -486,10 +584,14 @@ export default function App() {
           onChange={(e) => setLegalSex(e.target.value)}
           placeholder="e.g. Female"
         />
-      </section>
+      </CollapsibleSection>
 
-      <section className="form-section form-section-employment">
-        <h2>Employment Details</h2>
+      <CollapsibleSection
+        className="form-section-employment"
+        title="Employment Details"
+        open={openSections.employment}
+        onToggle={(isOpen) => setSectionOpen("employment", isOpen)}
+      >
         <label htmlFor="businessName">Business Name</label>
         <input
           id="businessName"
@@ -518,7 +620,7 @@ export default function App() {
           onChange={(e) => setSalary(e.target.value)}
           placeholder="e.g. 78000"
         />
-      </section>
+      </CollapsibleSection>
 
       <div className="buttons">
         <button onClick={handleView} disabled={loading}>VIEW</button>

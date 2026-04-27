@@ -54,6 +54,33 @@ h2 {
   margin: 20px 0 12px;
 }
 
+.instructions {
+  margin: 0 0 16px;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid #b9ccdb;
+  background: #f7fafc;
+}
+
+.instructions h2 {
+  margin: 0 0 10px;
+  font-size: 1.08rem;
+  color: var(--accent-strong);
+}
+
+.instructions h3 {
+  margin: 12px 0 4px;
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.instructions p {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
 .render-note {
   margin: 0 0 10px;
   padding: 10px 12px;
@@ -88,9 +115,42 @@ h2 {
 }
 
 .form-section h2 {
-  margin: 0 0 8px;
+  margin: 0;
   font-size: 1.03rem;
   color: var(--accent-strong);
+}
+
+.form-section summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  list-style: none;
+  cursor: pointer;
+}
+
+.form-section summary::-webkit-details-marker {
+  display: none;
+}
+
+.section-toggle {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #9bc3cc;
+  border-radius: 50%;
+  background: #eef8fa;
+  color: #0b6475;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.section-body {
+  padding-top: 8px;
 }
 
 label {
@@ -172,6 +232,13 @@ button:disabled {
   border-radius: 12px;
   border: 1px solid #b9ccdb;
   background: linear-gradient(180deg, #dde8f2, #cfdeeb);
+}
+
+.result-count {
+  margin: 12px 0 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ink-muted);
 }
 
 .client-card {
@@ -299,6 +366,10 @@ pre {
 
   .form-section {
     padding: 12px;
+  }
+
+  .form-section summary {
+    align-items: flex-start;
   }
 
   .client-card {
