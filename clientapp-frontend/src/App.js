@@ -122,7 +122,7 @@ export default function App() {
     return { response, payload };
   };
 
-  const buildPayloads = () => {
+  const buildCreatePayloads = () => {
     const trimmedFirstName = firstName.trim();
     const trimmedLastName = lastName.trim();
     const trimmedEmployment = employment.trim();
@@ -184,6 +184,67 @@ export default function App() {
     };
   };
 
+  const buildUpdatePayloads = () => {
+    const trimmedFirstName = firstName.trim();
+    const trimmedLastName = lastName.trim();
+    const trimmedEmployment = employment.trim();
+    const trimmedPersonFirstName = personFirstName.trim();
+    const trimmedPersonLastName = personLastName.trim();
+    const trimmedDateOfBirth = dateOfBirth.trim();
+    const trimmedAddress = address.trim();
+    const trimmedLegalSex = legalSex.trim();
+    const trimmedBusinessName = businessName.trim();
+    const trimmedPositionName = positionName.trim();
+    const trimmedSalary = salary.trim();
+
+    const clientPayload = {};
+    if (trimmedFirstName) clientPayload.firstName = trimmedFirstName;
+    if (trimmedLastName) clientPayload.lastName = trimmedLastName;
+    if (trimmedEmployment) clientPayload.employment = trimmedEmployment;
+
+    const personPayload = {};
+    if (trimmedPersonFirstName) personPayload.firstName = trimmedPersonFirstName;
+    if (trimmedPersonLastName) personPayload.lastName = trimmedPersonLastName;
+    if (trimmedDateOfBirth) {
+      const normalizedDateOfBirth = normalizeDateOfBirth(trimmedDateOfBirth);
+      if (!normalizedDateOfBirth) {
+        setStatus("Error: date of birth must be a valid date in YYYY-MM-DD format.");
+        return null;
+      }
+      personPayload.dateOfBirth = normalizedDateOfBirth;
+    }
+    if (trimmedAddress) personPayload.address = trimmedAddress;
+    if (trimmedLegalSex) personPayload.legalSex = trimmedLegalSex;
+
+    const employmentPayload = {};
+    if (trimmedBusinessName) employmentPayload.businessName = trimmedBusinessName;
+    if (trimmedPositionName) employmentPayload.positionName = trimmedPositionName;
+    if (trimmedSalary) {
+      const numericSalary = Number(trimmedSalary);
+      if (Number.isNaN(numericSalary) || numericSalary < 0) {
+        setStatus("Error: salary must be a non-negative number.");
+        return null;
+      }
+      employmentPayload.salary = numericSalary;
+    }
+
+    const hasUpdates =
+      Object.keys(clientPayload).length > 0 ||
+      Object.keys(personPayload).length > 0 ||
+      Object.keys(employmentPayload).length > 0;
+
+    if (!hasUpdates) {
+      setStatus("Error: enter at least one field value to update.");
+      return null;
+    }
+
+    return {
+      clientPayload,
+      personPayload,
+      employmentPayload,
+    };
+  };
+
   const fetchAndDisplayClient = async (id) => {
     const { payload } = await sendRequest(`/api/clients/${id}`, { method: "GET" });
     setResultData(payload);
@@ -215,7 +276,7 @@ export default function App() {
   };
 
   const handleCreate = async () => {
-    const payloads = buildPayloads();
+    const payloads = buildCreatePayloads();
     if (!payloads) return;
 
     setLoading(true);
@@ -271,7 +332,7 @@ export default function App() {
       return;
     }
 
-    const payloads = buildPayloads();
+    const payloads = buildUpdatePayloads();
     if (!payloads) return;
 
     setLoading(true);
@@ -279,23 +340,29 @@ export default function App() {
     const id = clientId.trim();
 
     try {
-      await sendRequest(`/api/clients/${id}`, {
-        method: "PUT",
-        body: JSON.stringify(payloads.clientPayload),
-      });
+      if (Object.keys(payloads.clientPayload).length > 0) {
+        await sendRequest(`/api/clients/${id}`, {
+          method: "PUT",
+          body: JSON.stringify(payloads.clientPayload),
+        });
+      }
 
-      await sendRequest(`/api/clients/${id}/person`, {
-        method: "PUT",
-        body: JSON.stringify(payloads.personPayload),
-      });
+      if (Object.keys(payloads.personPayload).length > 0) {
+        await sendRequest(`/api/clients/${id}/person`, {
+          method: "PUT",
+          body: JSON.stringify(payloads.personPayload),
+        });
+      }
 
-      await sendRequest(`/api/clients/${id}/employment`, {
-        method: "PUT",
-        body: JSON.stringify(payloads.employmentPayload),
-      });
+      if (Object.keys(payloads.employmentPayload).length > 0) {
+        await sendRequest(`/api/clients/${id}/employment`, {
+          method: "PUT",
+          body: JSON.stringify(payloads.employmentPayload),
+        });
+      }
 
       await fetchAndDisplayClient(id);
-      setStatus(`Updated client #${id}, including person and employment details.`);
+      setStatus(`Updated client #${id}.`);
     } catch (error) {
       setStatus(`Error: ${error.message}`);
     } finally {
@@ -469,7 +536,7 @@ export default function App() {
         <p>
           To view a record in the database, enter the Client ID, Client First Name, and/or
           Client Last Name into the inputs in the Client Record section. Then click VIEW at
-          the bottom.
+          the bottom. To VIEW all records, leave all input fields blank and click VIEW.
         </p>
 
         <h3>Create a New Record</h3>

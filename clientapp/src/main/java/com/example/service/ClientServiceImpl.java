@@ -53,15 +53,19 @@ public class ClientServiceImpl implements ClientService {
     @Transactional
     public Client updateClient(Integer clientId, String firstName, String lastName, String employment) {
         requireId(clientId);
-        requireNonBlank(firstName, "firstName is required.");
-        requireNonBlank(lastName, "lastName is required.");
-        requireNonBlank(employment, "employment is required.");
+        if (!hasText(firstName) && !hasText(lastName) && !hasText(employment)) {
+            throw new InvalidRequestException("At least one client field is required for update.");
+        }
 
         // Ensure the client exists (business-layer responsibility)
-        dao.getClient(clientId).orElseThrow(() ->
+        Client existing = dao.getClient(clientId).orElseThrow(() ->
                 new ResourceNotFoundException("Client not found: " + clientId));
 
-        return dao.updateClient(clientId, firstName, lastName, employment);
+        String updatedFirstName = hasText(firstName) ? firstName.trim() : existing.getFirstName();
+        String updatedLastName = hasText(lastName) ? lastName.trim() : existing.getLastName();
+        String updatedEmployment = hasText(employment) ? employment.trim() : existing.getEmployment();
+
+        return dao.updateClient(clientId, updatedFirstName, updatedLastName, updatedEmployment);
     }
 
     @Override
@@ -83,15 +87,37 @@ public class ClientServiceImpl implements ClientService {
     public Person upsertPerson(Integer clientId, Person person) {
         requireId(clientId);
         if (person == null) throw new InvalidRequestException("Person cannot be null.");
+
+        // Ensure parent exists (service-level rule)
+        dao.getClient(clientId).orElseThrow(() ->
+                new ResourceNotFoundException("Client not found for Person: " + clientId));
+
+        Optional<Person> existingPerson = dao.getPerson(clientId);
+        if (existingPerson.isPresent()) {
+            Person existing = existingPerson.get();
+            if (!hasText(person.getFirstName()) &&
+                    !hasText(person.getLastName()) &&
+                    person.getDateOfBirth() == null &&
+                    !hasText(person.getAddress()) &&
+                    !hasText(person.getLegalSex())) {
+                throw new InvalidRequestException("At least one person field is required for update.");
+            }
+
+            Person merged = new Person(
+                    hasText(person.getFirstName()) ? person.getFirstName().trim() : existing.getFirstName(),
+                    hasText(person.getLastName()) ? person.getLastName().trim() : existing.getLastName(),
+                    person.getDateOfBirth() != null ? person.getDateOfBirth() : existing.getDateOfBirth(),
+                    hasText(person.getAddress()) ? person.getAddress().trim() : existing.getAddress(),
+                    hasText(person.getLegalSex()) ? person.getLegalSex().trim() : existing.getLegalSex()
+            );
+            return dao.upsertPerson(clientId, merged);
+        }
+
         requireNonBlank(person.getFirstName(), "Person firstName is required.");
         requireNonBlank(person.getLastName(), "Person lastName is required.");
         if (person.getDateOfBirth() == null) throw new InvalidRequestException("Person dateOfBirth is required.");
         requireNonBlank(person.getAddress(), "Person address is required.");
         requireNonBlank(person.getLegalSex(), "Person legalSex is required.");
-
-        // Ensure parent exists (service-level rule)
-        dao.getClient(clientId).orElseThrow(() ->
-                new ResourceNotFoundException("Client not found for Person: " + clientId));
 
         return dao.upsertPerson(clientId, person);
     }
@@ -122,13 +148,31 @@ public class ClientServiceImpl implements ClientService {
     public Employment upsertEmployment(Integer clientId, Employment employment) {
         requireId(clientId);
         if (employment == null) throw new InvalidRequestException("Employment cannot be null.");
-        requireNonBlank(employment.getBusinessName(), "Employment businessName is required.");
-        requireNonBlank(employment.getPositionName(), "Employment positionName is required.");
-        if (employment.getSalary() == null) throw new InvalidRequestException("Employment salary is required.");
 
         // Ensure parent exists
         dao.getClient(clientId).orElseThrow(() ->
                 new ResourceNotFoundException("Client not found for Employment: " + clientId));
+
+        Optional<Employment> existingEmployment = dao.getEmployment(clientId);
+        if (existingEmployment.isPresent()) {
+            Employment existing = existingEmployment.get();
+            if (!hasText(employment.getBusinessName()) &&
+                    !hasText(employment.getPositionName()) &&
+                    employment.getSalary() == null) {
+                throw new InvalidRequestException("At least one employment field is required for update.");
+            }
+
+            Employment merged = new Employment(
+                    hasText(employment.getBusinessName()) ? employment.getBusinessName().trim() : existing.getBusinessName(),
+                    hasText(employment.getPositionName()) ? employment.getPositionName().trim() : existing.getPositionName(),
+                    employment.getSalary() != null ? employment.getSalary() : existing.getSalary()
+            );
+            return dao.upsertEmployment(clientId, merged);
+        }
+
+        requireNonBlank(employment.getBusinessName(), "Employment businessName is required.");
+        requireNonBlank(employment.getPositionName(), "Employment positionName is required.");
+        if (employment.getSalary() == null) throw new InvalidRequestException("Employment salary is required.");
 
         return dao.upsertEmployment(clientId, employment);
     }
@@ -158,6 +202,10 @@ public class ClientServiceImpl implements ClientService {
     }
 
     private void requireNonBlank(String val, String msg) {
-        if (val == null || val.trim().isEmpty()) throw new InvalidRequestException(msg);
+        if (!hasText(val)) throw new InvalidRequestException(msg);
+    }
+
+    private boolean hasText(String val) {
+        return val != null && !val.trim().isEmpty();
     }
 }

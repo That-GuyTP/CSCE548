@@ -48,10 +48,10 @@ describe("Client CRUD buttons", () => {
 
     render(<App />);
 
-    fireEvent.change(screen.getByLabelText("Client First Name (CREATE/MODIFY)"), {
+    fireEvent.change(screen.getByLabelText("Client First Name"), {
       target: { value: "Jane" },
     });
-    fireEvent.change(screen.getByLabelText("Client Last Name (CREATE/MODIFY)"), {
+    fireEvent.change(screen.getByLabelText("Client Last Name"), {
       target: { value: "Doe" },
     });
     fireEvent.change(screen.getByLabelText(/Employment Type/i), {
@@ -148,10 +148,10 @@ describe("Client CRUD buttons", () => {
     fireEvent.change(screen.getByLabelText(/Client ID/i), {
       target: { value: "1" },
     });
-    fireEvent.change(screen.getByLabelText("Client First Name (CREATE/MODIFY)"), {
+    fireEvent.change(screen.getByLabelText("Client First Name"), {
       target: { value: "Ava" },
     });
-    fireEvent.change(screen.getByLabelText("Client Last Name (CREATE/MODIFY)"), {
+    fireEvent.change(screen.getByLabelText("Client Last Name"), {
       target: { value: "Johnson" },
     });
     fireEvent.change(screen.getByLabelText(/Employment Type/i), {
@@ -201,8 +201,6 @@ describe("Client CRUD buttons", () => {
       {
         method: "PUT",
         body: JSON.stringify({
-          firstName: "Ava",
-          lastName: "Johnson",
           dateOfBirth: "1988-06-15",
           address: "77 Sunset Blvd, Columbia, SC 29205",
           legalSex: "Female",
@@ -236,6 +234,44 @@ describe("Client CRUD buttons", () => {
     );
   });
 
+  test("MODIFY sends only fields that have update values", async () => {
+    global.fetch
+      .mockResolvedValueOnce(jsonResponse({ clientId: 1 }))
+      .mockResolvedValueOnce(jsonResponse({ clientId: 1 }));
+
+    render(<App />);
+
+    fireEvent.change(screen.getByLabelText(/Client ID/i), {
+      target: { value: "1" },
+    });
+    fireEvent.change(screen.getByLabelText(/^Address$/i), {
+      target: { value: "88 Main St, Columbia, SC 29201" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "MODIFY" }));
+
+    await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(2));
+    expect(global.fetch).toHaveBeenNthCalledWith(
+      1,
+      "http://localhost:8080/api/clients/1/person",
+      {
+        method: "PUT",
+        body: JSON.stringify({
+          address: "88 Main St, Columbia, SC 29201",
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    expect(global.fetch).toHaveBeenNthCalledWith(
+      2,
+      "http://localhost:8080/api/clients/1",
+      { method: "GET" }
+    );
+  });
+
   test("DELETE calls DELETE /api/clients/{id}", async () => {
     global.fetch.mockResolvedValueOnce({
       ok: true,
@@ -264,8 +300,8 @@ describe("Client CRUD buttons", () => {
     render(<App />);
 
     const clientIdInput = screen.getByLabelText(/Client ID/i);
-    const firstNameInput = screen.getByLabelText("Client First Name (CREATE/MODIFY)");
-    const lastNameInput = screen.getByLabelText("Client Last Name (CREATE/MODIFY)");
+    const firstNameInput = screen.getByLabelText("Client First Name");
+    const lastNameInput = screen.getByLabelText("Client Last Name");
     const employmentInput = screen.getByLabelText(/Employment Type/i);
     const dateOfBirthInput = screen.getByLabelText(/Date of Birth/i);
     const addressInput = screen.getByLabelText(/^Address$/i);
@@ -285,7 +321,7 @@ describe("Client CRUD buttons", () => {
     fireEvent.change(positionNameInput, { target: { value: "Analyst" } });
     fireEvent.change(salaryInput, { target: { value: "78000" } });
 
-    fireEvent.click(screen.getByRole("button", { name: "Clear" }));
+    fireEvent.click(screen.getByRole("button", { name: "Clear Inputs" }));
 
     expect(clientIdInput.value).toBe("");
     expect(firstNameInput.value).toBe("");

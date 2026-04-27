@@ -105,9 +105,18 @@ public class ClientApp /* implements CommandLineRunner */ {
 
     private void updateClient(Scanner sc) {
         Integer id = promptInt(sc, "Client ID: ");
-        String fn = promptNonBlank(sc, "New first name: ");
-        String ln = promptNonBlank(sc, "New last name: ");
-        String empType = promptNonBlank(sc, "New employment (e.g., W2/1099/Unemployed): ");
+        String fn;
+        String ln;
+        String empType;
+
+        while (true) {
+            fn = promptOptional(sc, "New first name (leave blank to keep current): ");
+            ln = promptOptional(sc, "New last name (leave blank to keep current): ");
+            empType = promptOptional(sc, "New employment (leave blank to keep current): ");
+
+            if (!fn.isBlank() || !ln.isBlank() || !empType.isBlank()) break;
+            System.out.println("Enter at least one value to update.");
+        }
 
         Client updated = service.updateClient(id, fn, ln, empType);
         System.out.println("Updated: " + updated);
@@ -202,6 +211,11 @@ public class ClientApp /* implements CommandLineRunner */ {
             if (!s.isBlank()) return s;
             System.out.println("Value cannot be blank.");
         }
+    }
+
+    private String promptOptional(Scanner sc, String label) {
+        System.out.print(label);
+        return sc.nextLine().trim();
     }
 
     private LocalDate promptDate(Scanner sc, String label) {
